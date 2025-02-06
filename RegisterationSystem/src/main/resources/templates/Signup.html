@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup Form</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="/CSS/Style.css">
+    <script src="/JS/Signup.js" defer></script>
+</head>
+<body>
+<section>
+    <form id="signupForm">
+        <h1>Sign Up</h1>
+
+        <!-- Error Message Display -->
+        <div id="error-container"></div>
+
+        <div class="inputbox">
+            <ion-icon name="person-outline"></ion-icon>
+            <input type="text" id="firstName" name="firstName" required>
+            <label for="firstName">Firstname</label>
+        </div>
+
+        <div class="inputbox">
+            <ion-icon name="person-outline"></ion-icon>
+            <input type="text" id="lastName" name="lastName" required>
+            <label for="lastName">Lastname</label>
+        </div>
+
+        <div class="inputbox">
+            <ion-icon name="person-outline"></ion-icon>
+            <input type="text" id="username" name="username" required>
+            <label for="username">Username</label>
+        </div>
+
+        <div class="inputbox">
+            <ion-icon name="mail-outline"></ion-icon>
+            <input type="email" id="email" name="email" required>
+            <label for="email">Email</label>
+        </div>
+
+        <div class="inputbox">
+            <ion-icon name="phone-outline"></ion-icon>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+            <label for="phoneNumber">Phone Number</label>
+        </div>
+
+        <div class="inputbox">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <input type="password" id="password" name="password" required>
+            <label for="password">Password</label>
+        </div>
+
+        <div class="inputbox">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <input type="password" id="passwordcon" name="passwordcon" required>
+            <label for="passwordcon">Confirm Password</label>
+        </div>
+
+        <button id="submit" type="submit">Sign Up</button>
+
+        <div class="register">
+            <p>Already have an account? <a href="/login">Log In</a></p>
+        </div>
+    </form>
+</section>
+
+<script>
+    const submitButton = document.getElementById("submit");
+    const form = document.getElementById("signupForm");
+
+    submitButton.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        // Collect form data
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('passwordcon').value;
+
+        // Clear previous error messages
+        clearError();
+
+        if (password === confirmPassword) {
+            const data = {
+                firstName,
+                lastName,
+                username,
+                email,
+                phoneNumber,
+                password
+            };
+
+            // Send data to the server
+            fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(async response => {
+                    if (response.ok) {
+                        alert('Signup successful!');
+                        window.location.href = '/api/login';  // Redirect to login page
+                    } else {
+                        const errorMessage = await response.text();
+                        showError(errorMessage);  // Display error message from server
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An unexpected error occurred.');
+                });
+        } else {
+            showError('Passwords do not match!');
+        }
+    });
+
+    // Function to display error messages
+    function showError(message) {
+        const errorContainer = document.getElementById('error-container');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.style.color = 'red';
+        errorDiv.style.marginBottom = '10px';
+        errorDiv.textContent = message;
+        errorContainer.appendChild(errorDiv);
+    }
+
+    // Function to clear previous error messages
+    function clearError() {
+        const errorContainer = document.getElementById('error-container');
+        errorContainer.innerHTML = '';
+    }
+</script>
+</body>
+</html>
